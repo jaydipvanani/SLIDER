@@ -1,0 +1,151 @@
+<!-- На базе https://www.youtube.com/watch?v=P8wIEPNWIu0 -->
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        padding: 50px 20px;
+        background: #ffedd9;
+        text-align: center;
+    }
+
+    .button-next,
+    .button-perv,
+    .slider-wrapper,
+    .dot {
+        display: inline-block;
+        vertical-align: middle;
+        /* не center ) */
+    }
+
+    /* обрезаем то, что не входит в обертку */
+    .slider-wrapper {
+        width: 200px;
+        overflow: hidden;
+        margin: 15px;
+        border-radius: 10px;
+        box-shadow: 1px 1px 8px 1px rgba(161, 67, 0, 0.2);
+        ;
+    }
+
+    .slider-line {
+        display: flex;
+        position: relative;
+        /* чтобы двигать */
+        left: 0;
+        transition: all 0.5s easy-out;
+    }
+
+    .button-prev,
+    .button-next {
+        padding: 5px 10px;
+        background: #ff8a3c;
+        color: white;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .button-prev:hover,
+    .button-next:hover,
+    .dot:hover:not(.is-active) {
+        background: color-mix(in srgb, chocolate 50%, white);
+    }
+
+    .button-prev:active,
+    .button-next:active,
+    .dot:active {
+        opacity: 0.5;
+    }
+
+    .dot {
+        width: 20px;
+        height: 20px;
+        background: chocolate;
+        border-radius: 50%;
+        cursor: pointer;
+        margin: 3px;
+    }
+
+    .is-active {
+        background: brown;
+        cursor: auto;
+    }
+</style>
+<div class="container">
+    <button class="button-prev">PREV</button>
+
+    <div class="slider-wrapper">
+        <!-- обертка для сладов с помощью которой их двигаем  -->
+        <!-- !!! Интересный эффект при дефолтной слизации переносы строк между img воспринмаются, как пробелы и образуют промежутку между изображениями, от которых можно избавиться задав контейнеру slider-line display: flex; -->
+        <div class="slider-line">
+            <img class="slider-img" src="https://placehold.co/200x150/lightgreen/grey?text=1">
+            <img class="slider-img" src="https://placehold.co/200x150/lightgrey/grey?text=2">
+            <img class="slider-img" src="https://placehold.co/200x150/pink/grey?text=3">
+            <img class="slider-img" src="https://placehold.co/200x150/lightblue/grey?text=4">
+        </div>
+    </div>
+
+    <button class="button-next">NEXT</button>
+
+    <div class="dots-wrapper">
+        <div class="dot is-active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+</div>
+<script>
+    const sliderLine = document.querySelector('.slider-line'),
+        buttonPrev = document.querySelector('.button-prev'),
+        buttonNext = document.querySelector('.button-next'),
+        dots = document.querySelectorAll('.dot');
+
+    const slideWidth = 200,
+        slideAmount = dots.length;
+
+
+    let position = 0,
+        dotIndex = 0;
+
+    // FUNCTIONs
+    const nextSlide = () => {
+        position = (position < (slideAmount - 1) * slideWidth) ? position + slideWidth : 0;
+        sliderLine.style.left = `${-position}px`;
+        dotIndex = position / slideWidth;
+        thisSlide(dotIndex);
+    }
+
+    const prevSlide = () => {
+        position = (position > 0) ? position - slideWidth : (slideAmount - 1) * slideWidth;
+        sliderLine.style.left = `${-position}px`;
+        dotIndex = position / slideWidth;
+        thisSlide(dotIndex);
+    }
+
+    const thisSlide = (index) => {
+        for (let dot of dots) {
+            dot.classList.remove('is-active');
+        }
+        dots[index].classList.add('is-active');
+    }
+
+    // EVENT_LISTENERs
+    // нажатия на кнопки
+    buttonNext.addEventListener('click', nextSlide);
+    buttonPrev.addEventListener('click', prevSlide);
+
+    // Нажатие на пины пагинации
+    for (let [index, dot] of dots.entries()) {
+        dot.addEventListener('click', () => {
+            position = index * slideWidth;
+            sliderLine.style.left = `${-position}px`
+            dotIndex = index;
+            thisSlide(dotIndex);
+        });
+    }
+
+
+    setInterval(nextSlide, 2000);
+</script>
